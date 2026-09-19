@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080808">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="sakebi">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.svg">
+<title>sakebi translator</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div class="logo-wrap">
+    <div class="logo-text">sakebi <em>/</em> translate</div>
+  </div>
+  <div class="hd-right">
+    <button class="btn-clear" onclick="clearAll()"><i class="fa-regular fa-trash-can"></i> clear</button>
+    <button class="btn-dl" onclick="exportDocx()"><i class="fa-solid fa-arrow-down-to-line"></i> download docx</button>
+  </div>
+</header>
+
+<div class="app">
+  <div class="sidebar">
+    <div>
+      <div class="s-label">chapter info</div>
+      <div class="field"><label>manhwa name</label><input id="manhwaName" placeholder="Pearl Boy" oninput="updateFilename()"></div>
+      <div class="field"><label>chapter no.</label><input id="chapterNum" type="number" placeholder="69" oninput="updateFilename()"></div>
+      <div class="field"><label>translator</label><input id="translatorName" placeholder="Heegun" oninput="updateFilename();saveCookie()"></div>
+    </div>
+    <div>
+      <div class="s-label">output filename</div>
+      <div class="fname" id="fnPreview">—</div>
+    </div>
+    <div>
+      <div class="s-label">ending message</div>
+      <div class="tog-row">
+        <span class="tog-label">enabled</span>
+        <label class="tog"><input type="checkbox" id="endTog" checked onchange="updateEnding();saveCookie()"><span class="knob"></span></label>
+      </div>
+      <div class="ending-box" id="endBox">خسته نباشی تایپیست گل ࣪ ִֶָ☾.</div>
+    </div>
+    <div>
+      <div class="s-label">legend</div>
+      <div class="legend">
+        <div class="leg-row"><div class="leg-line"></div><i class="fa-regular fa-comment"></i><span>balloon</span></div>
+        <div class="leg-row"><div class="leg-line"></div><i class="fa-solid fa-align-right"></i><span>outside</span></div>
+        <div class="leg-row"><div class="leg-line"></div><i class="fa-regular fa-note-sticky"></i><span>note</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="editor">
+    <div id="blocks"></div>
+    <div class="empty" id="empty">
+      <i class="fa-regular fa-message"></i>
+      <p>no blocks yet</p>
+    </div>
+    <div class="add-row">
+      <button class="add-btn" onclick="addBlock('balloon')"><i class="fa-regular fa-comment"></i> balloon</button>
+      <button class="add-btn" onclick="addBlock('outside')"><i class="fa-solid fa-align-right"></i> outside</button>
+      <button class="add-btn" onclick="addBlock('note')"><i class="fa-regular fa-note-sticky"></i> note</button>
+    </div>
+  </div>
+</div>
+
+<!-- bottom nav -->
+<div class="nav">
+  <button class="nav-add" onclick="addBlock('balloon')"><i class="fa-regular fa-comment"></i> balloon</button>
+  <button class="nav-add" onclick="addBlock('outside')"><i class="fa-solid fa-align-right"></i> outside</button>
+  <button class="nav-add" onclick="addBlock('note')"><i class="fa-regular fa-note-sticky"></i> note</button>
+  <button class="nav-ico" onclick="openDrawer()"><i class="fa-solid fa-sliders"></i></button>
+  <button class="nav-dl" onclick="exportDocx()"><i class="fa-solid fa-arrow-down-to-line"></i> docx</button>
+</div>
+
+<!-- drawer -->
+<div class="overlay" id="overlay" onclick="closeDrawer()">
+  <div class="drawer" onclick="event.stopPropagation()">
+    <button class="drawer-x" onclick="closeDrawer()"><i class="fa-solid fa-xmark"></i></button>
+    <div style="margin-top:26px">
+      <div class="s-label">chapter info</div>
+      <div class="field"><label>manhwa name</label><input id="m_manhwaName" placeholder="Pearl Boy" oninput="syncD('manhwaName','m_manhwaName')"></div>
+      <div class="field"><label>chapter no.</label><input id="m_chapterNum" type="number" placeholder="69" oninput="syncD('chapterNum','m_chapterNum')"></div>
+      <div class="field"><label>translator</label><input id="m_translatorName" placeholder="Heegun" oninput="syncD('translatorName','m_translatorName');saveCookie()"></div>
+    </div>
+    <div>
+      <div class="s-label">output filename</div>
+      <div class="fname" id="m_fnPreview">—</div>
+    </div>
+    <div>
+      <div class="s-label">ending message</div>
+      <div class="tog-row">
+        <span class="tog-label">enabled</span>
+        <label class="tog"><input type="checkbox" id="m_endTog" checked onchange="syncEnd()"><span class="knob"></span></label>
+      </div>
+      <div class="ending-box" id="m_endBox">خسته نباشی تایپیست گل ࣪ ִֶָ☾.</div>
+    </div>
+    <div style="margin-top:auto;padding-top:10px">
+      <button class="btn-clear" style="width:100%;justify-content:center" onclick="clearAll()"><i class="fa-regular fa-trash-can"></i> clear all</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="script.js"></script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>
