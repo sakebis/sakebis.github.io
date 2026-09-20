@@ -136,10 +136,10 @@ function syncD(did, mid) {
 }
 
 function openDrawer() {
-  document.getElementById('m_manhwaName').value   = document.getElementById('manhwaName').value;
-  document.getElementById('m_chapterNum').value   = document.getElementById('chapterNum').value;
+  document.getElementById('m_manhwaName').value    = document.getElementById('manhwaName').value;
+  document.getElementById('m_chapterNum').value    = document.getElementById('chapterNum').value;
   document.getElementById('m_translatorName').value = document.getElementById('translatorName').value;
-  document.getElementById('m_endTog').checked     = document.getElementById('endTog').checked;
+  document.getElementById('m_endTog').checked      = document.getElementById('endTog').checked;
   updateFilename();
   document.getElementById('overlay').classList.add('open');
 }
@@ -165,9 +165,6 @@ async function exportDocx() {
     const ENDING   = 'خسته نباشی تایپیست گل ࣪ ִֶָ☾.';
     const filename = `${n} ch${c} (${t}).docx`;
 
-    /* colors per block type */
-    const C = { balloon: 'd0d0d0', outside: 'aaaaaa', note: 'cccccc', end: 'bbbbbb' };
-
     function xmlEsc(s) {
       return s
         .replace(/&/g, '&amp;')
@@ -176,19 +173,7 @@ async function exportDocx() {
         .replace(/"/g, '&quot;');
     }
 
-    /*
-     * makePara — fully RTL paragraph
-     *
-     * Key fixes vs. the original:
-     *  1. <w:rFonts w:cs="Arial"/> — "cs" targets Complex Script (Arabic/Persian)
-     *     so Word actually applies the font to RTL runs.
-     *  2. <w:bidi/> inside <w:pPr> tells Word the paragraph is RTL.
-     *  3. <w:rtl/> inside <w:rPr> marks the run as RTL.
-     *  4. <w:jc w:val="right"/> aligns text to the right.
-     *  Without (1) Word ignores the font for Persian glyphs and the layout breaks.
-     */
-    function makePara(text, color) {
-      /* handle multi-line text: split on newlines, one <w:p> per line */
+    function makePara(text) {
       const lines = text.split('\n');
       return lines.map(line => `
 <w:p>
@@ -197,7 +182,6 @@ async function exportDocx() {
     <w:jc w:val="right"/>
     <w:rPr>
       <w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/>
-      <w:color w:val="${color}"/>
       <w:sz w:val="24"/><w:szCs w:val="24"/>
       <w:rtl/>
     </w:rPr>
@@ -205,7 +189,6 @@ async function exportDocx() {
   <w:r>
     <w:rPr>
       <w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/>
-      <w:color w:val="${color}"/>
       <w:sz w:val="24"/><w:szCs w:val="24"/>
       <w:rtl/>
     </w:rPr>
@@ -223,14 +206,14 @@ async function exportDocx() {
     let bodyXml = '';
     for (const b of blocks) {
       let txt;
-      if (b.type === 'note')    txt = `*م.ت: ${b.text}`;
+      if (b.type === 'note')         txt = `*م.ت: ${b.text}`;
       else if (b.type === 'outside') txt = `*${b.text}*`;
-      else                      txt = b.text;
-      bodyXml += makePara(txt, C[b.type]);
+      else                           txt = b.text;
+      bodyXml += makePara(txt);
     }
     if (on) {
       bodyXml += emptyParas(18);
-      bodyXml += makePara(ENDING, C.end);
+      bodyXml += makePara(ENDING);
     }
 
     /* document.xml */
@@ -247,7 +230,7 @@ async function exportDocx() {
   </w:body>
 </w:document>`;
 
-    /* styles.xml — set RTL + Arial CS as document defaults */
+    /* styles.xml */
     const stylesXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
   <w:docDefaults>
